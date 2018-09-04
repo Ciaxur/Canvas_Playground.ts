@@ -5,14 +5,17 @@
 
 
 const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+
 
 /**
- * Client Configuration Part of the Webpack
+ * Server Configuration Part of the Webpack
  */
-const clientConfig = {
+const serverConfig = {
     // Config Target and Mode
     mode: "development",        // development | production | none
-    target: 'web',              // Web Targeted (web | node)
+    target: 'node',              // Web Targeted (web | node)
 
 
     // Entry Files
@@ -29,6 +32,24 @@ const clientConfig = {
             path.resolve('node_modules')
         ]
     },
+
+
+    // Plugins
+    plugins: [
+        new CopyWebpackPlugin([
+            {
+                from: './src/Resources/**/*',
+                to: 'Resources/',
+                flatten: true
+            },
+            {
+                from: './src/Shaders/**/*',
+                to: 'Shaders/',
+                flatten: true
+            }
+        ])
+    ],
+
 
     // Apply Loaders
     module: {
@@ -49,4 +70,4 @@ const clientConfig = {
 };
 
 // Multiple Configuration Exports
-module.exports = [clientConfig];
+module.exports = [serverConfig];

@@ -6,33 +6,48 @@
  */
 
 /** Module Imports */
-import { HEIGHT, WIDTH } from './Constants';
+import { HEIGHT, WIDTH, DEFAULT_SHADERS } from './Constants';
+import { initEvents } from './Events/Events';
+import { RenderContext } from './Types';
+import { readStrFile } from '../IO/FileIO';
 
 
 /** Create a Canvas DOM Element and CanvasContext */
+
 export const canvas = <HTMLCanvasElement> document.createElement('canvas');
-export const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
+export let ctx: CanvasRenderingContext2D = null;
+export let gl: WebGLRenderingContext = null;
 document.body.appendChild(canvas);
 
 /** Setup Canvas Dimensions */
 canvas.width = WIDTH;
 canvas.height = HEIGHT;
 
-/** CTX Properties Setup */
-ctx.webkitImageSmoothingEnabled = true;
-ctx.oImageSmoothingEnabled = true;
-ctx.imageSmoothingEnabled = true;
-
 /** Global Variables */
 let fn: Function = () => { };       // Function called inside Draw
+let canvasInit: boolean = false;    // State of Canvas
 let bgColor = null;                 // Background Color
+let bgDrawn = false;                // State of Background Drawn
 let started = false;                // State of the Canvas Draw
+let drawStop = false;               // State of Stopping Canvas Draw
+let noClear = false;                // State of Clearing Canvas
+
 
 /** Drawing Function
  * @param func Function to call in drawing
  */
-export function draw(func: Function): void {
+export function setDraw(func: Function): void {
     fn = func;
+
+    // Initiate Canvas
+    if (!canvasInit) {
+        // Make Sure ctx or gl is Initiated
+        // If not Default Start
+        if (!ctx && !gl) {
+            startCanvas('2d');
+        }
+        canvasInit = true
+    };
 }
 
 /** Clears the Entire Screen */
@@ -52,14 +67,72 @@ export function background(r: number, g: number, b: number): void {
     }
 }
 
-/** Starts Canvas API */
-export function startCanvas(): void {
+/** Resets Background Draw State to false */
+export function resetBackgroundState(): void {
+    bgDrawn = false;
+}
+
+/** Setst the No Clearing State
+ * @param state The state of the No Clear
+ */
+export function setNoClearState(state: boolean): void {
+    noClear = state;
+}
+
+/** Starts Canvas API 
+ * Only ONE Canvas at a time
+ * 
+ * @param context The Canvas Rendering Context used (2d | webgl)
+*/
+export function startCanvas(context: RenderContext): void {
+    // Throw error if already started
+    if (started) {
+        console.error(new Error("Canvas Already Started!"));
+        return;
+    }
+
     // Only start if not started
-    started
-        ? console.error(new Error("Canvas Already Started!"))
-        : start();
+    else {
+        // 2D Rendering Canvas
+        if (context === '2d') {
+            ctx = canvas.getContext(context);
+
+            /** CTX Properties Setup */
+            ctx.webkitImageSmoothingEnabled = true;
+            ctx.oImageSmoothingEnabled = true;
+            ctx.imageSmoothingEnabled = true;
+        }
+
+        // WebGL Canvas
+        else if (context === 'webgl') {
+            // Load WebGL Context
+            gl = canvas.getContext(context);
+
+            // Load Deafult WebGL Shaders
+            initDefaultShaders();
+        }
+            
+        // Throw error if neither
+        else {
+            console.error(new Error("Invalid Canvas Context!"));
+            return;
+        }
+
+        // Initiate Canvas Events
+        initEvents();
+
+        // Initiate the Canvas
+        start()
+    }
 
     started = true;
+    drawStop = false;
+}
+
+/** Stop Canvas API */
+export function noDraw(): void {
+    drawStop = true;
+    started = false;
 }
 
 
@@ -67,20 +140,31 @@ export function startCanvas(): void {
 
 // Initiates Canvas Drawing
 function start(): void {
-    // Clear Canvas || Draw Background
-    if (bgColor) {
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        ctx.fill();
-    } else {
-        clearCanvas();
+    // Non-WebGL Drawing
+    if (ctx) {
+        // No Clear | Draw Background | Clear Canvas
+        if (noClear) {
+            // Draw Initial Background only
+            bgDrawn ? null : drawBackground();
+        }
+        else if (bgColor) {
+            drawBackground();
+        } else {
+            clearCanvas();
+        }
     }
+
+    // WebGL Drawing
+    // TO BE ADDED LATER HERE..........................
+
 
     // Draw onto Canvas
     fn();
 
     // Request Second Frame (Loop)
-    window.requestAnimationFrame(start);
+    // Loop if not to stop
+    if(!drawStop)
+        window.requestAnimationFrame(start);
 }
 
 /**
@@ -117,4 +201,24 @@ function between(value: number, num1: number, num2: number): boolean {
     else {
         return (value >= num1 && value <= num2);
     }
+}
+
+/** Draws Background */
+function drawBackground(): void {
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    ctx.fill();
+
+    // Set Background Draw State
+    bgDrawn = true;
+}
+
+
+
+
+/** WebGL Init Functions */
+/** Initiates Default Shaders */
+function initDefaultShaders(): void {
+    DEFAULT_SHADERS.Fragment.Basic = (readStrFile(__dirname + 'Shaders/Basic.frag', true) as string);
+    DEFAULT_SHADERS.Vertex.Basic = (readStrFile(__dirname + 'Shaders/Basic.vert', true) as string);
 }

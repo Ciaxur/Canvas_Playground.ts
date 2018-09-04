@@ -3,7 +3,7 @@
 --
 This project is simply me learning the ins and outs of the **`Canvas API`** but I will be updating this repository as I learn more. Anyone is welcome to use this and contribute :).
 
-# How to use
+# How Install
 In this project, I used Yarn for all the package dependencies. The first step is to install all the required packages (I am not going into how to use `yarn` or `powershell`).
 
 
@@ -15,6 +15,9 @@ yarn
 ```
 
 Code away in the **`app.ts`** file making sure to import any modules from other directories in the Library.
+
+---
+# How to Build
 
 Once finished coding, build the Library using **`npm`**.
 ``` powershell
@@ -31,20 +34,6 @@ To lauch the Built application, simply launch a local server. I use python to do
 python -m http.server
 ```
 
----
-# Understanding the Library
-
-To use the Library it's simple, just go through the Methods under each Directory in `src` depending on what you want to do. Here is a list of what each Typescript File is about:
-
-- **`Canvas.ts`** - Starting the Canvas, the Draw loop, Clearing Background, and Setting a Background Color.
-- **`Constants.ts`** - Contains all the Canvas Constants used such as the Width and Height of the Canvas.
-- **`Preload.ts`** - Constains a botched "Preload" method (Will update it to actually work). The file is for everything that should Preload before starting the Canvas.
-- **`Math.ts`** - Contains Trigonometry and Formula functions used for simple calculations.
-- **`Random.ts`** - Contains Methods that Generate Random Numbers
-- **`Vectors.ts`** - Contains a Vector Class for X,Y locations.
-- **`Shapes.ts`** - Contains methods for drawing shapes, filling them, and adding a stroke to them.
-
----
 
 # Contribution
 

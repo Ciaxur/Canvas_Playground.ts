@@ -8,6 +8,7 @@
         "noImplicitAny": false,
         "noImplicitThis": true,
         "alwaysStrict": true,
+        "sourceMap": true,
 
         "outDir": "out/"
     },

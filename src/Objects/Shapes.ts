@@ -16,6 +16,7 @@ import { ctx } from "../Canavs/Canvas";
  * @param r The Radius of Circle
  */
 export function circle(x: number, y: number, r: number): void {
+    ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI*2);
 }
 
@@ -44,6 +45,7 @@ export function drawLine(x1: number, y1: number, x2: number, y2: number): void {
 export function fill(r: number, g: number, b: number): void {
     ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
     ctx.fill();
+    ctx.closePath();
 }
 
 /**
@@ -55,6 +57,7 @@ export function fill(r: number, g: number, b: number): void {
 export function stroke(r: number, g: number, b: number): void {
     ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
     ctx.stroke();
+    ctx.closePath();
 }
 
 /**

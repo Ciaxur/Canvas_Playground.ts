@@ -1,0 +1,47 @@
+=== Version 1.1.0 ===
+
+- Required the GL_Matrix npm Library
+- Added WebGL Support
+- Added WebGL Library
+    - Added WebGL Shapes Module
+    - Added Buffer Class Library
+    - Added Colors Class Library
+    - Added Scene Class Library
+    - Added Shapes Library
+    - Added Main WebGL Class Library
+    - Added Interfaces
+    - Added Textures
+- Added Array Library
+- Renamed the "Objects" Modules
+- Added Simple Trig Formulas
+- Updated Vectors Library
+    - Added Vector3D Class
+    - Added createVector2D
+    - Added createVector3D
+    - Adjusted createVector to recognize 2D or 3D
+- Added a "Resources" & "Shaders" Directory that ONLY copies when Webpack compiles
+    - All files in the DIR should NOT be in sub-directories (Flattens the Files when copying)
+- Removed "Preload.ts"
+- Added a new way to Preload in "app.ts"
+- Added "Lighting.ts"
+- Added VS Code Workspace Config File
+- Added Directory ".config"
+    - Added tslint Config File
+- Refactored WebGL Directory to have neater Sub-Directories
+    - Core (Core WebGL Library)
+    - Examples (Example for the Library)
+    - Global (Global Data throughout the WebGL Library)
+    - Material (WebGL Material Data such as Lighting, Texture, Color, etc...)
+    - Memory (Memory Management Data such as Buffers)
+    - Debug (Debugging Methods)
+    - Object (WebGL Objects such as Shapes)
+- Added New Shape Generations
+- Split up WebGL Scene into two main Methods (render and bindBuffers)
+- Refactored WebGL.ts to have all the other Classes such as Examples, Materials, Objects, etc...
+    - This way it's a single Library Class for all others combined
+- Added Lighting.ts (Class) that handles how the Shader Program renders the Lighting
+
+
+
+TO-DO: 
+    - Update the README.md, specifically add how the 'src' directory is Structured and what they do :)
