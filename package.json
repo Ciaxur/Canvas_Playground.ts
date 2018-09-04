@@ -1,0 +1,21 @@
+{
+    "private": true,
+    "name": "canvas_playground",
+    "version": "1.0.0",
+    "description": "Canvas Playground - Simple Playground for drawing using the HTML5 Canvas.",
+    "scripts": {
+        "build": "webpack",
+        "watch": "webpack --watch"
+    },
+    "keywords": [],
+    "author": "Omar Omar",
+    "license": "UNLICENSED",
+    "dependencies": {
+        "@types/jquery": "^3.3.4",
+        "jquery": "^3.3.1",
+        "ts-loader": "^4.4.2",
+        "typescript": "^2.9.2",
+        "webpack": "^4.16.0",
+        "webpack-cli": "^3.0.8"
+    }
+}
