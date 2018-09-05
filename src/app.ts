@@ -2,7 +2,7 @@ import { setDraw, ctx, background, setNoClearState, gl, canvas, startCanvas, noD
 import { WIDTH, HEIGHT, setCanvasSize, CENTER_X, CENTER_Y, DEFAULT_SHADERS } from './Canavs/Constants';
 import { circle, fill, stroke, drawLine, strokeWeight } from './Objects/Shapes';
 import { WebGL } from './WebGL/Core/WebGL';
-import { WebGL_ShaderProgramInfo } from './WebGL/Global/Interfaces';
+import { WebGL_ShaderProgramInfo, WebGL_TextureBuffer } from './WebGL/Global/Interfaces';
 import { within, Vector2D, createVector, createVector3D, createVector2D } from './Math/Vectors';
 import { PI, TWO_PI, cos, sin, isPowerOf2, TAU } from './Math/Math';
 import { mouse } from './Canavs/Events/Mouse';
@@ -117,12 +117,14 @@ begin();
 function debug() {
     console.log("----DEBUGGING----");
 
-    // Circle Shape
-    const circ = WebGL.Shapes.Generate.createCircle(createVector2D(), null, null, 0.5);
+    // Create Cube
+    // const cube = new WebGL.Shapes.Create.Cube3D();
+    // buffers.add(cube);
+    const circ = WebGL.Shapes.Generate.createCircle(createVector2D());
     buffers.add(circ);
 
     // WebGL Data
-    WebGL_Debug.logActiveAttributes(shaderProgram, gl);
+    // WebGL_Debug.logActiveAttributes(shaderProgram, gl);
     
     
     // Render to Canvas

@@ -90,7 +90,7 @@ export abstract class Textures {
      * @param url The URL to load Texture from
      * @returns A Promise with the WebGL Texture Buffer Object
      */
-    static loadAnimatingTexture(url: string): any {
+    static loadAnimatingTexture(url: string): WebGL_TextureBuffer {
         // Create an Empty Texture
         const texture = this.createSolidTexture(null, () => {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -127,7 +127,7 @@ export abstract class Textures {
         video.src = url;
         video.play();
 
-        
+
         // Return Texture Object
         return textureBufferData;
     }
