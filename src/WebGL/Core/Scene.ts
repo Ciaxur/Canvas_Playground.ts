@@ -78,7 +78,7 @@ export class Scene {
         }
         
         // Draw the Object(s)
-        for(const buffer of buffers.buffers) {
+        for (const buffer of buffers.buffers) {
             const vertexCount = buffer.vertexCount;
             const offset = 0;
 
@@ -236,6 +236,9 @@ export class Scene {
                     normalMatrix
                 );
             }
+
+            // Unbind Array Buffer when done
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
         
         
