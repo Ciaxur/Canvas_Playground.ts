@@ -1,5 +1,4 @@
 {
-    "private": true,
     "name": "canvas_playground",
     "version": "1.1.0",
     "description": "Canvas Playground - Simple Playground for drawing using the HTML5 Canvas.",
@@ -9,7 +8,7 @@
     },
     "keywords": [],
     "author": "Omar Omar",
-    "license": "UNLICENSED",
+    "license": "MIT",
     "dependencies": {
         "@types/gl-matrix": "^2.4.1",
         "@types/jquery": "^3.3.4",
