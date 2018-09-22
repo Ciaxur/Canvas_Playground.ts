@@ -1,2 +1,7 @@
+# Ignore These Directories
 node_modules
 backup
+dist/*
+
+# Except for These
+!dist/index.html
