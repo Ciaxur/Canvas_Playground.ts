@@ -74,7 +74,7 @@ export abstract class GenerateShapes {
 
     /** Returns a Shape Object
      * @param pos A Vector for the Origin Point of Shape Object
-     * @param quality The Quality of the Circle, Value <= 1 but not 0 (Number of Iterations from 0 to 2PI) (Optional -> Default = 0.2)
+     * @param quality The Quality of the Circle, Value <= 0.7 but not 0 (Number of Iterations from 0 to 2PI) (Optional -> Default = 0.2)
      * @param radius Circle's Radius (Optional -> Default = 1)
      * @param depth Circle's Z-Axis Thickness (Optional -> Default = 0)
      * @param texture WebGL Texture Buffer for Shape (Optional)
@@ -92,11 +92,10 @@ export abstract class GenerateShapes {
         radius = radius ? radius : 1;
 
         // Validate Quality
-        if (quality && (quality <= 0 || quality > 1)) {
-            console.error(new Error("Shape Generation: Cicle Creation, Quality value between 0 - 1!"));
+        if (quality && (quality <= 0 || quality > 0.7)) {
+            console.error(new Error("Shape Generation: Circle Creation, Quality value between 0 - 0.7!"));
             return null;
         } else if(!quality) { quality = this.DEFUALT_CIRCLE_QUALITY }; // Assign Default Quality Value
-
 
 
 
@@ -187,6 +186,114 @@ export abstract class GenerateShapes {
 
 
 
+        // Create the Depth (Cylinder)
+        if (depth) {
+            // Properties
+            const MAX_TIMES = verticies[0].length;
+            const TOTAL_POINTS_PER_FACE = 4;
+            let isSave = false;
+
+            // Used Arrays
+            let final2Arrays = [];
+            let dummyArr = [];
+            let cylinder = [];
+
+            // Algorithm Varaibles
+            let i = 0;
+            let j = 0;
+
+            // Algorithm Init
+            for (let x = 0; x < MAX_TIMES && j < MAX_TIMES; x++) {
+                // Pre-Testing
+                if ((x + 1) % 2 === 0) {
+                    i = (i + 1) % 2;
+                }
+
+            
+                // Obtain Vector Points
+                const arr = [];
+                for (let y = 0; y < 3; y++) {
+                    arr.push(verticies[i][y + j]);
+                }
+
+            
+                // Add Points to Dummy Array
+                dummyArr.push(arr);
+
+
+                // Array Tracking of last 2 Vector Points (Arrays)
+                if (isSave) {
+                    final2Arrays.push(arr);
+                }
+
+
+
+                // Dump Dummy Array into Verticies
+                if (dummyArr.length >= TOTAL_POINTS_PER_FACE) {
+                    // Store the Values into the Cylinder Array
+                    for (const arr of dummyArr) {
+                        for (const val of arr) {
+                            cylinder.push(val);
+                        }
+                    }
+
+                    // Apply Data to Verticies
+                    verticies.push(cylinder);
+
+                    // Reset Arrays
+                    cylinder = [];
+                    dummyArr = [];
+                }
+            
+
+
+                // Post-Testing
+                if ((x + 1) % 2 === 0) {
+                    j += 3;
+
+                    // Add last Values of Array to Array
+                    if (final2Arrays.length) {
+                        for (const arr of final2Arrays) {
+                            dummyArr.push(arr);
+                        }
+                    }
+
+                    // Reset Array Save States
+                    final2Arrays = [];
+                    isSave = true;
+                }
+
+            }
+
+
+            // TRYING TO FIX THE LITTLE ANNOYING OPENING PATCH -_-
+            if (dummyArr.length != 0) {
+                // Get all data values from the Dummy Array
+                for (const arr of dummyArr) {
+                    for (const val of arr) {
+                        cylinder.push(val);
+                    }
+                }
+
+                // Go from the last known point from the Dummy Array back to the beginning of 
+                //  the cylinder vertex point (Loop back around to the first point)
+                j = 0;
+                i = 1;
+                for (let x = 0; x < (TOTAL_POINTS_PER_FACE - dummyArr.length); x++) {
+                    for (let y = 0; y < 3; y++) {
+                        cylinder.push(verticies[i][y + j]);
+                    }
+                    j += 3;
+                    i = (i + 1) % 2;
+                }
+
+                
+                verticies.push(cylinder);
+            }
+
+        }
+
+        
         // Create the Shape
         const circ = Shapes.createShape(verticies, null, texture, normalsArr);
         
