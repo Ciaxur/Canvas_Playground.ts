@@ -45,3 +45,9 @@
 
 TO-DO: 
     - Update the README.md, specifically add how the 'src' directory is Structured and what they do :)
+    - Refactor bindBuffer to have the Texture and the rest of the info in Buffer in order to BIND it before it draws it
+
+
+Later Work:
+    - Refactor the Cirlce's Depth (Cylinder Algorithm) under GenerateShapes -> createCircle
+    - Fix issue when creating a Circle with NO depth, the shape is not flat but tilted
