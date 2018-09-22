@@ -29,11 +29,17 @@ export class ShapeBuffer {
 
     /** Adds new Shape into Buffer Class 
      * 
-     * @param shapeClass The Shape Object that will be added to current Buffer Class
+     * @param shape The Shape Object or array of Shape Objects that will be added to current Buffer Class
      */
-    public add(shapeClass: Shapes): void {
-        this.shapeObj.push(shapeClass);
-        this.buffers.push(shapeClass.buffer);
+    public add(shapes: Shapes | Shapes[]): void {
+        // Assign the Array of shapes OR add the ONE shape to array
+        const arr: Shapes[] = shapes instanceof Array ? shapes : [shapes];
+
+        // Loop through the array adding data to ShapeBuffer class
+        for (const shape of arr) {
+            this.shapeObj.push(shape);
+            this.buffers.push(shape.buffer);
+        }
     }
 
     /** Removes a Shape based on its Index Value 
