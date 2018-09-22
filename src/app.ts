@@ -80,7 +80,7 @@ function debug() {
     const texture2 = WebGL.Textures.createSolidTexture({ r: 255, g: 0, b: 0 });
 
     // Create Objects
-    const circle = WebGL.Shapes.Generate.createCircle(createVector2D(0, 0), 0.1, null, null, texture1);
+    const circle = WebGL.Shapes.Generate.createCircle(createVector2D(0, 0), 0.1, null, 1, texture1);
     const cube = WebGL.Shapes.Generate.createCube3D(createVector3D(-5), null, texture2);
     buffers.add([circle, cube]);
 }

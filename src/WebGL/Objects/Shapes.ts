@@ -4,6 +4,7 @@ import { WebGL_BufferLocation, WebGL_TextureBuffer, WebGL_RenderSettings } from 
 import { Texture_Pixels } from "../Global/Types";
 import { is2DArray, flatten2DArray } from "../../Math/Array";
 import { unitCircle, TWO_PI, PI } from "../../Math/Math";
+import { linkVertices } from "./Algorithms";
 
 
 
@@ -188,109 +189,12 @@ export abstract class GenerateShapes {
 
         // Create the Depth (Cylinder)
         if (depth) {
-            // Properties
-            const MAX_TIMES = verticies[0].length;
-            const TOTAL_POINTS_PER_FACE = 4;
-            let isSave = false;
-
-            // Used Arrays
-            let final2Arrays = [];
-            let dummyArr = [];
-            let cylinder = [];
-
-            // Algorithm Varaibles
-            let i = 0;
-            let j = 0;
-
-            // Algorithm Init
-            for (let x = 0; x < MAX_TIMES && j < MAX_TIMES; x++) {
-                // Pre-Testing
-                if ((x + 1) % 2 === 0) {
-                    i = (i + 1) % 2;
-                }
-
-            
-                // Obtain Vector Points
-                const arr = [];
-                for (let y = 0; y < 3; y++) {
-                    arr.push(verticies[i][y + j]);
-                }
-
-            
-                // Add Points to Dummy Array
-                dummyArr.push(arr);
-
-
-                // Array Tracking of last 2 Vector Points (Arrays)
-                if (isSave) {
-                    final2Arrays.push(arr);
-                }
-
-
-
-                // Dump Dummy Array into Verticies
-                if (dummyArr.length >= TOTAL_POINTS_PER_FACE) {
-                    // Store the Values into the Cylinder Array
-                    for (const arr of dummyArr) {
-                        for (const val of arr) {
-                            cylinder.push(val);
-                        }
-                    }
-
-                    // Apply Data to Verticies
-                    verticies.push(cylinder);
-
-                    // Reset Arrays
-                    cylinder = [];
-                    dummyArr = [];
-                }
-            
-
-
-                // Post-Testing
-                if ((x + 1) % 2 === 0) {
-                    j += 3;
-
-                    // Add last Values of Array to Array
-                    if (final2Arrays.length) {
-                        for (const arr of final2Arrays) {
-                            dummyArr.push(arr);
-                        }
-                    }
-
-                    // Reset Array Save States
-                    final2Arrays = [];
-                    isSave = true;
-                }
-
+            const cylinder = linkVertices(verticies[0], verticies[1]);
+        
+            // Apply Result Shape onto the Final Shape
+            for (const arr of cylinder) {
+                verticies.push(arr);
             }
-
-
-            // TRYING TO FIX THE LITTLE ANNOYING OPENING PATCH -_-
-            if (dummyArr.length != 0) {
-                // Get all data values from the Dummy Array
-                for (const arr of dummyArr) {
-                    for (const val of arr) {
-                        cylinder.push(val);
-                    }
-                }
-
-                // Go from the last known point from the Dummy Array back to the beginning of 
-                //  the cylinder vertex point (Loop back around to the first point)
-                j = 0;
-                i = 1;
-                for (let x = 0; x < (TOTAL_POINTS_PER_FACE - dummyArr.length); x++) {
-                    for (let y = 0; y < 3; y++) {
-                        cylinder.push(verticies[i][y + j]);
-                    }
-                    j += 3;
-                    i = (i + 1) % 2;
-                }
-
-                
-                verticies.push(cylinder);
-            }
-
         }
 
         
@@ -515,16 +419,16 @@ export abstract class Shapes {
     
 
 // Translation Methods
-    /** Translates the Shape a new Position 
+    /** Translates the Shape in the direction of the moveTo vector
      * 
-     * @param newPos Vector3D of the New Location
+     * @param vecTo Vector3D of the New Location
     */
-    public translate(newPos: Vector3D): void {
+    public translate(vecTo: Vector3D): void {
         
         // Make a Deep Copy
-        this.position = newPos.copy();
+        this.position = vecTo.copy();
 
-        // Translate 3D Cube to a Position
+        // Translate Shape to a Position
         for (const face of this.vertices) {
             for (let x = 0; x < face.length; x += 3) {
                 // X-Axis
@@ -549,7 +453,12 @@ export abstract class Shapes {
     /** Updates the Buffer */
     public updateBuffer(): void {
         this.bufferUpdated = true;
-        this.buffer = WebGL.createBuffer(this.vertices, this.indicies, this.texture, this.normals);
+
+        if (this.buffer) {
+            WebGL.updateBuffer(this.buffer, this.vertices, this.indicies, this.texture, this.normals);
+        } else {
+            this.buffer = WebGL.createBuffer(this.vertices, this.indicies, this.texture, this.normals);
+        }
     }
 
     /** Resets Buffer Updated State */
