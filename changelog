@@ -40,12 +40,19 @@
 - Refactored WebGL.ts to have all the other Classes such as Examples, Materials, Objects, etc...
     - This way it's a single Library Class for all others combined
 - Added Lighting.ts (Class) that handles how the Shader Program renders the Lighting
+- Added an Algorithm.ts Module to Generate/Calculate Manipulations and Structures based on Math
+    - Connects two Verticies (Shapes) together
 
 
 
 TO-DO: 
     - Update the README.md, specifically add how the 'src' directory is Structured and what they do :)
     - Refactor bindBuffer to have the Texture and the rest of the info in Buffer in order to BIND it before it draws it
+    - Adapt the "linkVertices" method in Algorithm.ts to be able to adapt to different vertex length from vert1 or vert2
+        - Concept: 
+            - If Vert1 has more points than vert2, divide the number of points from vert1 to adapt to vert2 connecting ALL points
+                from vert1 to all points from vert2.
+            - If vert2 has more points than vert1 same thing, connect ALL points from vert2 to all points from vert1
 
 
 Later Work:
