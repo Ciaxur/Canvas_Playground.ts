@@ -50,4 +50,6 @@ TO-DO:
 
 Later Work:
     - Refactor the Cirlce's Depth (Cylinder Algorithm) under GenerateShapes -> createCircle
-    - Fix issue when creating a Circle with NO depth, the shape is not flat but tilted
+
+Bugs:
+    - Issue when creating a Circle with NO depth, the shape is not flat but tilted
