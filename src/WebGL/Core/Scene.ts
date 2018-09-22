@@ -1,5 +1,5 @@
 import { WebGL } from "./WebGL";
-import { WebGL_ShaderProgramInfo } from '../Global/Interfaces';
+import { WebGL_ShaderProgramInfo, WebGL_BufferLocation, WebGL_RenderSettings } from '../Global/Interfaces';
 import { PI } from "../../Math/Math";
 import { mat4 } from "gl-matrix";
 import { gl } from "../../Canavs/Canvas";
@@ -76,31 +76,50 @@ export class Scene {
         if (program) {
             gl.useProgram(program);
         }
-        
+
         // Draw the Object(s)
         for (const buffer of buffers.buffers) {
+            // Bind the Buffer
+            this.bindBuffers(buffer);
+
+            // Draw the Object
             const vertexCount = buffer.vertexCount;
             const offset = 0;
 
+
             // Indicies Vertex Positioning
             if (buffer.indices) {
+                // Bind the Working Buffer
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
+
+                
                 const type = gl.UNSIGNED_SHORT;
                 gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+
+                // Unbind when Done
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             }
 
             // Positional Vertex
             else {
-                gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
+                // Bind Working Buffer
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffer.position);
+                
+                // Draw
+                gl.drawArrays(gl.TRIANGLE_FAN, offset, vertexCount);
+                
+                // Unbind when Done
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
             }
         }
     }
 
 
     /** Binds Buffers into WebGL Memory
-     * @param buffers The Shape Buffer Object
+     * @param buffers The Shape Buffer Object or BufferLocation Object
      * @param programInfo The WebGL Shader Program Information (Optional -> If provided, Current one will be overwritten)
      */
-    public bindBuffers(buffers: WebGL_ShapeBuffer, programInfo?: WebGL_ShaderProgramInfo): void {
+    public bindBuffers(buffers: WebGL_ShapeBuffer | WebGL_BufferLocation, programInfo?: WebGL_ShaderProgramInfo): void {
         // Validate Program Information is Available in either Param or as Varialbe
         if (!programInfo && !this.PROG_INFO) {
             console.error(new Error("WebGL Scene Error! No Program Information Defined!"));
@@ -114,17 +133,53 @@ export class Scene {
         gl.useProgram(this.PROG_INFO.program);
 
 
-
+        // Assign Buffer Data Types
+        let bufferArr: WebGL_BufferLocation[];
+        let isBufferObject: Boolean = false;
+        
+        // Buffer Loaction Object
+        if ((buffers as WebGL_BufferLocation).position) {
+            bufferArr = [buffers as WebGL_BufferLocation];
+        }
+        
+        // Shape Buffer Object
+        else {
+            bufferArr = (buffers as WebGL_ShapeBuffer).buffers;
+            isBufferObject = true;
+        }
+        
         // Setup Scene Rendering Information
         let bufferNum = -1;     // Buffer Number
+        let renderSettings: WebGL_RenderSettings = {        // Set Default renderSettings Object
+            positions: {
+                normalize: null,
+                offset: null,
+                stride: null,
+                type: null
+            },
+            normals: {
+                normalize: null,
+                offset: null,
+                stride: null,
+                type: null
+            }, 
+            textures: { 
+                normalize: null,
+                offset: null,
+                stride: null,
+                type: null
+            }
+        };
+
         // Bind all Buffers
-        for (const buffer of buffers.buffers) {
+        for (const buffer of bufferArr) {
             // Keep Track of Buffer Data
             bufferNum++;
-            const renderSettings = buffers.getRenderSettings(bufferNum);
-            
 
-        
+            if (isBufferObject) {
+                renderSettings = (buffers as WebGL_ShapeBuffer).getRenderSettings(bufferNum);
+            }
+            
             // Tell WebGL how to pull out positions from the position buffer into vertexPosition attribute
             {
                 // Render Settings for Position Attribute (Override)
@@ -317,7 +372,7 @@ export class Scene {
      */
     public rotateZ(radians: number): void {
         // Rotate Camera
-        mat4.rotateX(
+        mat4.rotateZ(
             this.Matrix_ModelView,
             this.Matrix_ModelView,
             radians
