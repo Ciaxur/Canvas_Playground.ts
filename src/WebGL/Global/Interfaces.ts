@@ -31,7 +31,7 @@ export interface WebGL_BufferLocation {
     // Texture
     textureCoord?: WebGLBuffer;
     texture?: WebGLTexture;
-
+    
     // Lighting
     normal?: WebGLBuffer;
 }

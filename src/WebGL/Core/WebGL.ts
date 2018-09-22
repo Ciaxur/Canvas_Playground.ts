@@ -376,6 +376,117 @@ export abstract class WebGL {
         return buffer3D;
     }
 
+    /** Updates a Buffer based on Buffers Given and Data
+     * 
+     * Creates a 3D Buffer Based on Points (X, Y, Z)
+     * Apply Color to Faces
+     * 
+     * Points (X, Y, Z) have to be divisible by 3
+     * 
+     * Position Verticies can be a 2D Array based on each Face [ [x,y,z ...], [x,y,z ...] ]
+     *  So each Sub-Array would be a set of Verticies that connect a Face
+     * Same with Indicies (2D Array based on each Face...)
+     * 
+     * @param positions The [ X, Y, Z ] Positions of Each Point
+     * @param indices The Triangular Indices for each Face of the object (Each face is two triangles)
+     * @param textures Texture Buffer that will be assign to the 3D Buffer (Optional Default -> WHITE)
+     * @param normalsArr Object's Normals Values (Optional -> Default Algorithmically Generated)
+     */
+    static updateBuffer(buffer: WebGL_BufferLocation, positions: number[] | number[][], indices: number[] | number[][],  textures?: WebGL_TextureBuffer, normalsArr?: number[] | number[][]): void {
+        // Verify WebGL Status
+        if (!WebGL.VERIFY_WEBGL_STATUS()) return null;
+
+        // Flatten Verticies & Indicies if 2D Array
+        // Only if it's not a Float32Array
+        positions = is2DArray(positions) ? flatten2DArray(positions as number[][]) : positions as number[];
+        indices = is2DArray(indices) ? flatten2DArray(indices as number[][]) : indices as number[];
+
+        // Validate Points Match 3D Shape
+        if (positions.length % 3) {
+            console.error(new Error("Failed to Update Vertex Buffer! 3D Buffer Positions have to be [X, Y, Z]."));
+            return null;
+        }
+
+        // Validate Colors and Create Varialbes Used
+        const posNum = (positions.length / 3) / 4;        // Total Number of Vertex Points PER (X, Y, Z) -> Each Face = 4(Verticies = 3 Points (x,y,z))
+        
+        
+        // Update Textures to 3D Object
+        if(textures) {
+            // Generate Texture Coordinates
+            textures.textureCoordinates = this.Textures.generateTextureCoordinates(posNum);
+
+            // Assign a Working Texture Buffer
+            // Create a Buffer if no Texture Buffer was Found
+            // Else use the already created Buffer
+            const textureCoorBuffer = buffer.textureCoord ? buffer.textureCoord : gl.createBuffer();
+
+            // Bind the Texture Coordinate Buffer
+            gl.bindBuffer(gl.ARRAY_BUFFER, textureCoorBuffer);
+
+            // Assign to WebGL
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures.textureCoordinates), gl.STATIC_DRAW);
+
+            // Add Data to Overall Buffer
+            buffer.textureCoord = textureCoorBuffer;
+            buffer.texture = textures.texture;
+        }
+
+
+
+        // Update the Vertex Position Buffer
+        {
+            // Create a buffer if none found
+            // Else assign already used buffer
+            const posBuffer = buffer.position ? buffer.position : gl.createBuffer();
+
+            // Select posBuffer as "Active One"
+            gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+            buffer.position = posBuffer;
+
+            // Pass Position to WebGL to Build Shape
+            // Create Float32Array from Javascript Array then Fill into Current Buffer
+            gl.bufferData(
+                gl.ARRAY_BUFFER,
+                new Float32Array(positions as number[]),
+                gl.STATIC_DRAW);
+        }
+
+
+
+        // Update Indices Buffer and apply it
+        {
+            // Create Buffer if none found
+            // Else use the one stored
+            const indexBuffer = buffer.indices ? buffer.indices : gl.createBuffer();
+
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+            // Send Indices Element array to GL
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices as number[]), gl.STATIC_DRAW);
+
+            // Assign the Buffer to the Overall Buffer Object
+            buffer.indices = indexBuffer;
+
+            // Unbind Buffer when Done
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+        }
+
+
+        // Unbind Buffer when Done
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        // Create Normals (Lighting)
+        // Check if Normals Array is given
+        if (normalsArr) {
+            // Flatten Normals Array
+            normalsArr = is2DArray(normalsArr) ? flatten2DArray(normalsArr as number[][]) : normalsArr;
+        }
+
+        const normalBuffer = this.Lighting.generateNormals(positions as number[], normalsArr as number[]);
+        buffer.normal = normalBuffer;
+    }
+
 // SHAPE MANIPULATION
     /** Generates an Array of Indices based on the 2D Array 
      * The 2D Array is to split up each faces
