@@ -5,6 +5,7 @@ import { mat4 } from "gl-matrix";
 import { gl } from "../../Canavs/Canvas";
 import { LightingTypes } from "../Global/Types";
 import { WebGL_Lighting, WebGL_ShapeBuffer } from "./ClassTypes";
+import { ShapeBuffer } from "../Memory/Buffer";
 
 
 /**
@@ -63,10 +64,10 @@ export class Scene {
     
 // Rendering Methods
     /** Renders the Scene using the Perspective Matrix Values, Shaders, and Buffers of Object 
-     * @param buffers The WebGL Shape Buffer that will be Rendered
+     * @param buffers The WebGL Shape Buffer or the BufferLoaction Itself that will be Rendered
      * @param program The WebGL Program that will be used (Optional -> Defaulted to the One given in BindBuffers)
     */
-    public render(buffers: WebGL_ShapeBuffer, program?: WebGLProgram): void {
+    public render(buffers: WebGL_ShapeBuffer | WebGL_BufferLocation, program?: WebGLProgram): void {
         // Clear Background to Depth Default Values
         if(this.DRAW_BKG)
             WebGL.depthBackground(0.0, 0.0, 0.0);
@@ -77,8 +78,13 @@ export class Scene {
             gl.useProgram(program);
         }
 
+        
+        // Verifiy and Adapt to buffers variable type
+        // Assign to the Buffer Class' Buffers Array or the Actual Buffers Loaction in an Array
+        const bufferData: WebGL_BufferLocation[] = buffers instanceof ShapeBuffer ? buffers.buffers : [buffers];
+
         // Draw the Object(s)
-        for (const buffer of buffers.buffers) {
+        for (const buffer of bufferData) {
             // Bind the Buffer
             this.bindBuffers(buffer);
 
@@ -313,6 +319,9 @@ export class Scene {
 
     /** Updates Camera Matricies in WebGL Memory */
     public updateCameraBuffer(): void {
+        // Make sure WebGL is using the Program
+        gl.useProgram(this.PROG_INFO.program);
+        
         // Update Camera Matricies
         gl.uniformMatrix4fv(
             this.PROG_INFO.uniformLocations.modelViewMatrix,
