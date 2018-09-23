@@ -270,10 +270,10 @@ export abstract class WebGL {
         // Verify WebGL Status
         if (!WebGL.VERIFY_WEBGL_STATUS()) return null;
 
-        // Flatten Verticies & Indicies if 2D Array
+        // Flatten Verticies
         // Only if it's not a Float32Array
         positions = is2DArray(positions) ? flatten2DArray(positions as number[][]) : positions as number[];
-        indices = is2DArray(indices) ? flatten2DArray(indices as number[][]) : indices as number[];
+        
 
         // Validate Points Match 3D Shape
         if (positions.length % 3) {
@@ -284,7 +284,7 @@ export abstract class WebGL {
         // Buffer Object Varialbe
         const buffer3D: WebGL_BufferLocation = {
             position: null,
-            vertexCount: indices.length
+            vertexCount: positions.length / 3             // Default Set is Positions' Length (3 Data Points = 1 3D Point [x,y,z])
         };
 
 
@@ -340,9 +340,14 @@ export abstract class WebGL {
         }
 
 
-
         // Create Indices Buffer and apply it
-        {
+        if(indices){
+            // Indicies if 2D Array
+            indices = is2DArray(indices) ? flatten2DArray(indices as number[][]) : indices as number[];
+
+            // Set VertexCount According to Indices
+            buffer3D.vertexCount = indices.length;
+            
             const indexBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 
@@ -396,10 +401,9 @@ export abstract class WebGL {
         // Verify WebGL Status
         if (!WebGL.VERIFY_WEBGL_STATUS()) return null;
 
-        // Flatten Verticies & Indicies if 2D Array
+        // Flatten Verticies
         // Only if it's not a Float32Array
         positions = is2DArray(positions) ? flatten2DArray(positions as number[][]) : positions as number[];
-        indices = is2DArray(indices) ? flatten2DArray(indices as number[][]) : indices as number[];
 
         // Validate Points Match 3D Shape
         if (positions.length % 3) {
@@ -455,7 +459,10 @@ export abstract class WebGL {
 
 
         // Update Indices Buffer and apply it
-        {
+        if (indices) {
+            // Flatten Indicies if 2D Array
+            indices = is2DArray(indices) ? flatten2DArray(indices as number[][]) : indices as number[];
+
             // Create Buffer if none found
             // Else use the one stored
             const indexBuffer = buffer.indices ? buffer.indices : gl.createBuffer();
