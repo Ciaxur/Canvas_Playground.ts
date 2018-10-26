@@ -52,4 +52,4 @@ Contributing is very simple, don't move directories around, but feel free to add
 
 ---
 # License
-Licensed under the [MIT License](LICENSE.md).
+Licensed under the [MIT License](LICENSE).
