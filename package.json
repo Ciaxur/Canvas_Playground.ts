@@ -7,7 +7,7 @@
         "watch": "webpack --watch",
         "clean": "npm run clean:dist",
         "clean:dist": "rm dist/* -rf",
-        "clean:all": "rm -rf node_modules"
+        "clean:all": "rm -rf node_modules && npm run clean:dist"
     },
     "keywords": [],
     "author": "Omar Omar",
