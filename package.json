@@ -3,8 +3,11 @@
     "version": "1.1.0",
     "description": "Canvas Playground - Simple Playground for drawing using the HTML5 Canvas.",
     "scripts": {
-        "build": "webpack",
-        "watch": "webpack --watch"
+        "build": "cp ./src/index.html ./dist && webpack",
+        "watch": "webpack --watch",
+        "clean": "npm run clean:dist",
+        "clean:dist": "rm dist/* -rf",
+        "clean:all": "rm -rf node_modules"
     },
     "keywords": [],
     "author": "Omar Omar",
